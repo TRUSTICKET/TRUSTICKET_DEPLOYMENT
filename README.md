@@ -1,0 +1,2 @@
+# TRUSTICKET_DEPLOYMENT
+Deployment TRUSTICKET with k8s
