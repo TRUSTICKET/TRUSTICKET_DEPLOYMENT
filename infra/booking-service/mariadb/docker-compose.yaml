@@ -1,0 +1,22 @@
+version: "3.7"
+networks:
+  trusticket-network:
+    external: true
+    name: trusticket-network
+services:
+  tt-booking-database:
+    platform: linux/x86_64
+    image: mariadb:10.11.2
+    container_name: tt-booking-database
+    environment:
+      MYSQL_DATABASE: "trusticket-booking-db"
+      MYSQL_ROOT_PASSWORD: "1111"
+    ports:
+      - 4004:3306
+    volumes:
+      - ./volumes/mariadb:/var/lib/mysql
+    networks:
+      - trusticket-network
+
+
+ 
