@@ -1,0 +1,52 @@
+apiVersion: apps/v1  
+kind: Deployment     
+metadata:
+  name: tt-booking-service  
+spec:
+  replicas: 1  
+  selector:
+    matchLabels:
+      app: tt-booking-service 
+  template:  
+    metadata:
+      labels:
+        app: tt-booking-service  
+    spec:
+      containers:
+        - image: sjh9708/trusticket-booking-service:latest  
+          name: tt-booking-service  
+          ports:
+            - containerPort: 8080  
+              protocol: TCP        
+          env:
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: kafka-bootstrap-server
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: booking-database-server-connection-string
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: tt-k8s-secret
+                  key: booking-database-username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tt-k8s-secret
+                  key: booking-database-password
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: booking-redis-host
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: booking-redis-port
+      restartPolicy: Always  

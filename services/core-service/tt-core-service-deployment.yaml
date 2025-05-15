@@ -1,0 +1,56 @@
+apiVersion: apps/v1  # 이 리소스가 "Deployment"임을 명시. 버전은 apps/v1이 가장 널리 쓰임.
+kind: Deployment     # 이 리소스의 종류는 Deployment (파드 생성 및 관리 컨트롤러)
+
+metadata:
+  name: tt-core-service  # Deployment의 이름. kubectl로 조회할 때 식별자 역할
+
+spec:
+  replicas: 1  # 파드를 몇 개 띄울지 설정. 1이면 단일 인스턴스로 운영
+
+  selector:
+    matchLabels:
+      app: tt-core-service  # 어떤 파드들을 이 Deployment가 관리할지 라벨로 정의
+
+  template:  # 이 Deployment가 생성할 파드의 템플릿
+    metadata:
+      labels:
+        app: tt-core-service  # 생성된 파드에 자동으로 붙는 라벨 (selector와 반드시 일치해야 함)
+
+    spec:
+      containers:
+        - image: sjh9708/trusticket-core-service:latest  # 실행할 컨테이너 이미지 (Docker Hub 등에서 가져옴)
+          name: tt-core-service  # 컨테이너 이름 (내부적으로 구분용)
+
+          ports:
+            - containerPort: 8080  # 컨테이너 내부의 애플리케이션이 바인딩(listen)하고 있는 포트, 서비스가 이 포트에서 listen함
+              protocol: TCP        # 프로토콜은 TCP (기본값이라 생략 가능)
+
+          env:
+            # (직접 환경변수 설정) Kafka 서버 주소 직접 지정
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: kafka-bootstrap-server
+            # (ConfigMap 사용)ConfigMap에서 특정 key만 꺼내어 환경변수로 사용
+            - name: CORE_DATABASE_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: core-database-server
+            # (동적 환경변수 주입) 위에서 주입된 CORE_DATABASE_SERVER를 이용하여 동적으로 URL 조합
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mariadb://${CORE_DATABASE_SERVER}/trusticket-core-db?characterEncoding=UTF-8&serverTimezone=UTC
+            # (Secret 사용) Secret에서 DB 사용자명/Password 주입
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: tt-k8s-secret
+                  key: core-database-username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tt-k8s-secret
+                  key: core-database-password
+
+      restartPolicy: Always  # 파드가 비정상 종료될 경우 항상 재시작하도록 설정 (기본값이기도 함)

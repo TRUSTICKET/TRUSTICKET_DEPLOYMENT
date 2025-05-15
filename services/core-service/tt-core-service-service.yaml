@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service  # 이 리소스는 클러스터 내부에서 파드에 접근할 수 있도록 해주는 'Service'입니다
+
+metadata:
+  name: tt-core-service  # Service 이름 (내부 DNS 이름, 접근 식별자 역할)
+
+spec:
+  ports:
+    - name: "http"        # 포트에 대한 이름 (선택사항, 메트릭용 등으로 사용됨)
+      port: 18080         # 클러스터 내부에서 이 서비스에 접근할 때 사용할 포트 (ex: 다른 파드가 http://tt-core-service:18080)
+      targetPort: 8080    # 실제 파드 내부 컨테이너가 사용 중인 포트 (Deployment에서 containerPort로 지정한 포트)
+
+  selector:
+    app: tt-core-service  # 어떤 파드를 이 서비스가 대상으로 삼을지 결정하는 label (Deployment의 template.metadata.labels와 일치해야 함)

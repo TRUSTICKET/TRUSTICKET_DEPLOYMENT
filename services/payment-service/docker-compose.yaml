@@ -1,0 +1,24 @@
+# 개발 서버 전용
+version: "3.7"
+networks:
+  trusticket-network:
+    external: true
+    name: trusticket-network
+
+services:
+  tt-payment-service:
+    image: sjh9708/trusticket-payment-service:latest
+    restart: always
+    ports:
+      - 18081:8080
+    container_name: tt-payment-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://tt-payment-database:3306/trusticket-payment-db?characterEncoding=UTF-8&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1111
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: tt-kafka:19092
+      SPRING_KAFKA_ADMIN_PROPERTIES_BOOTSTRAP_SERVERS: tt-kafka:19092
+#    volumes:
+#      - ./volumes/storage/upload:/app/trusticet/storage/upload
+    networks:
+      - trusticket-network

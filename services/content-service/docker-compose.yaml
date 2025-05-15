@@ -1,0 +1,23 @@
+# 개발 서버 전용
+version: "3.7"
+networks:
+  trusticket-network:
+    external: true
+    name: trusticket-network
+
+services:
+  tt-content-service:
+    image: sjh9708/trusticket-content-service:latest
+    restart: always
+    ports:
+      - 18083:8080
+    container_name: tt-content-service
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: tt-kafka:19092
+      SPRING_ELASTICSEARCH_SERVERS: tt-elasticsearch:9200
+      REDIS_HOST: tt-booking-redis
+      REDIS_PORT: 6379
+#    volumes:
+#      - ./volumes/storage/upload:/app/trusticet/storage/upload
+    networks:
+      - trusticket-network

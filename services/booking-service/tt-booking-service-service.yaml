@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: tt-booking-service
+  name: tt-booking-service
+spec:
+  ports:
+    - name: "18082"
+      port: 18082
+      targetPort: 8080
+  selector:
+    io.kompose.service: tt-booking-service

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: tt-content-service
+  name: tt-content-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: tt-content-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: tt-content-service
+    spec:
+      containers:
+        - env:
+            - name: REDIS_HOST
+              value: tt-booking-redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: SPRING_ELASTICSEARCH_SERVERS
+              value: tt-elasticsearch:9200
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: tt-kafka:19092
+          image: sjh9708/trusticket-content-service:latest
+          name: tt-content-service
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always

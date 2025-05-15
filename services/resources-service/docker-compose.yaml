@@ -1,0 +1,20 @@
+# 개발 서버 전용
+version: "3.7"
+networks:
+  trusticket-network:
+    external: true
+    name: trusticket-network
+
+services:
+  tt-resources-service:
+    image: sjh9708/trusticket-resources-service:latest
+    restart: always
+    ports:
+      - 18084:8080
+    container_name: tt-resources-service
+    environment:
+      SPRING_RESOURCES_DIR: storage/upload
+    volumes:
+      - ./volumes/storage/upload:/app/trusticket/storage/upload
+    networks:
+      - trusticket-network

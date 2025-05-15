@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: tt-resources-service
+  name: tt-resources-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: tt-resources-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: tt-resources-service
+    spec:
+      containers:
+        - env:
+            - name: SPRING_RESOURCES_DIR
+              value: storage/upload
+          image: sjh9708/trusticket-resources-service:latest
+          name: tt-resources-service
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /app/trusticket/storage/upload
+              name: tt-resources-service-claim0
+      restartPolicy: Always
+      volumes:
+        - name: tt-resources-service-claim0
+          persistentVolumeClaim:
+            claimName: tt-resources-service-claim0

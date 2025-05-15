@@ -1,0 +1,25 @@
+# 개발 서버 전용
+version: "3.7"
+networks:
+  trusticket-network:
+    external: true
+    name: trusticket-network
+
+services:
+  tt-booking-service:
+    image: sjh9708/trusticket-booking-service:latest
+    restart: always
+    ports:
+      - 18082:8080
+    container_name: tt-booking-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://tt-booking-database:3306/trusticket-booking-db?characterEncoding=UTF-8&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1111
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: tt-kafka:19092
+      REDIS_HOST: tt-booking-redis
+      REDIS_PORT: 6379
+#    volumes:
+#      - ./volumes/storage/upload:/app/trusticet/storage/upload
+    networks:
+      - trusticket-network
