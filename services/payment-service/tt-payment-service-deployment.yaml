@@ -1,40 +1,67 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apps/v1  
+kind: Deployment     
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.36.0 (HEAD)
-  labels:
-    io.kompose.service: tt-payment-service
-  name: tt-payment-service
+  name: tt-payment-service  
 spec:
-  replicas: 1
+  replicas: 1  
   selector:
     matchLabels:
-      io.kompose.service: tt-payment-service
-  template:
+      app: tt-payment-service 
+  template:  
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose.yaml
-        kompose.version: 1.36.0 (HEAD)
       labels:
-        io.kompose.service: tt-payment-service
+        app: tt-payment-service  
     spec:
       containers:
-        - env:
-            - name: SPRING_DATASOURCE_PASSWORD
-              value: "1111"
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:mariadb://tt-payment-database:3306/trusticket-payment-db?characterEncoding=UTF-8&serverTimezone=UTC
-            - name: SPRING_DATASOURCE_USERNAME
-              value: root
-            - name: SPRING_KAFKA_ADMIN_PROPERTIES_BOOTSTRAP_SERVERS
-              value: tt-kafka:19092
-            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
-              value: tt-kafka:19092
-          image: sjh9708/trusticket-payment-service:latest
-          name: tt-payment-service
+        - image: sjh9708/trusticket-payment-service:latest  
+          name: tt-payment-service  
           ports:
-            - containerPort: 8080
-              protocol: TCP
-      restartPolicy: Always
+            - containerPort: 8080  
+              protocol: TCP        
+          env:
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: kafka-bootstrap-server
+            - name: SPRING_KAFKA_ADMIN_PROPERTIES_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: kafka-bootstrap-server
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: payment-database-server-connection-string
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: tt-k8s-secret
+                  key: payment-database-username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tt-k8s-secret
+                  key: payment-database-password
+          resources:
+            requests:
+              cpu: "100m"         # 최소 0.1 core 사용 요청
+              memory: "128Mi"     # 최소 128MB 메모리 요청
+            limits:
+              cpu: "300m"         # 최대 0.3 core 제한
+              memory: "512Mi"     # 최대 512MB 제한
+          livenessProbe:
+            httpGet:
+              path: /booking/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /booking/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5              
+      restartPolicy: Always  
+

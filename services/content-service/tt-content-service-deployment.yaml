@@ -1,38 +1,62 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apps/v1  
+kind: Deployment     
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.36.0 (HEAD)
-  labels:
-    io.kompose.service: tt-content-service
-  name: tt-content-service
+  name: tt-content-service  
 spec:
-  replicas: 1
+  replicas: 1  
   selector:
     matchLabels:
-      io.kompose.service: tt-content-service
-  template:
+      app: tt-content-service 
+  template:  
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose.yaml
-        kompose.version: 1.36.0 (HEAD)
       labels:
-        io.kompose.service: tt-content-service
+        app: tt-content-service  
     spec:
       containers:
-        - env:
-            - name: REDIS_HOST
-              value: tt-booking-redis
-            - name: REDIS_PORT
-              value: "6379"
-            - name: SPRING_ELASTICSEARCH_SERVERS
-              value: tt-elasticsearch:9200
-            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
-              value: tt-kafka:19092
-          image: sjh9708/trusticket-content-service:latest
-          name: tt-content-service
+        - image: sjh9708/trusticket-content-service:latest  
+          name: tt-content-service  
           ports:
-            - containerPort: 8080
-              protocol: TCP
-      restartPolicy: Always
+            - containerPort: 8080  
+              protocol: TCP        
+          env:
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: kafka-bootstrap-server
+            - name: SPRING_ELASTICSEARCH_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: elasticsearch-server
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: booking-redis-host
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: tt-k8s-configmap
+                  key: booking-redis-port
+          resources:
+            requests:
+              cpu: "100m"         # 최소 0.1 core 사용 요청
+              memory: "128Mi"     # 최소 128MB 메모리 요청
+            limits:
+              cpu: "300m"         # 최대 0.3 core 제한
+              memory: "512Mi"     # 최대 512MB 제한
+          livenessProbe:
+            httpGet:
+              path: /booking/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /booking/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5    
+      restartPolicy: Always  
+

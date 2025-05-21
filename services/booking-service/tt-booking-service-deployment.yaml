@@ -17,7 +17,7 @@ spec:
           name: tt-booking-service  
           ports:
             - containerPort: 8080  
-              protocol: TCP        
+              protocol: TCP   
           env:
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               valueFrom:
@@ -49,4 +49,23 @@ spec:
                 configMapKeyRef:
                   name: tt-k8s-configmap
                   key: booking-redis-port
+          resources:
+            requests:
+              cpu: "100m"         # 최소 0.1 core 사용 요청
+              memory: "128Mi"     # 최소 128MB 메모리 요청
+            limits:
+              cpu: "300m"         # 최대 0.3 core 제한
+              memory: "512Mi"     # 최대 512MB 제한
+          livenessProbe:
+            httpGet:
+              path: /booking/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /booking/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5     
       restartPolicy: Always  

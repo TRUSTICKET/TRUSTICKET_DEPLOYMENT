@@ -1,41 +1,50 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apps/v1  
+kind: Deployment     
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.36.0 (HEAD)
-  labels:
-    io.kompose.service: tt-resources-service
-  name: tt-resources-service
+  name: tt-resources-service  
 spec:
-  replicas: 1
+  replicas: 1  
   selector:
     matchLabels:
-      io.kompose.service: tt-resources-service
-  strategy:
-    type: Recreate
-  template:
+      app: tt-resources-service 
+  template:  
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose.yaml
-        kompose.version: 1.36.0 (HEAD)
       labels:
-        io.kompose.service: tt-resources-service
+        app: tt-resources-service  
     spec:
       containers:
-        - env:
+        - image: sjh9708/trusticket-resources-service:latest
+          name: tt-resources-service
+          env:
             - name: SPRING_RESOURCES_DIR
               value: storage/upload
-          image: sjh9708/trusticket-resources-service:latest
-          name: tt-resources-service
           ports:
             - containerPort: 8080
               protocol: TCP
           volumeMounts:
             - mountPath: /app/trusticket/storage/upload
-              name: tt-resources-service-claim0
+              name: tt-resources-service-pvc
+          resources:
+            requests:
+              cpu: "100m"         # 최소 0.1 core 사용 요청
+              memory: "128Mi"     # 최소 128MB 메모리 요청
+            limits:
+              cpu: "300m"         # 최대 0.3 core 제한
+              memory: "512Mi"     # 최대 512MB 제한
+          livenessProbe:
+            httpGet:
+              path: /booking/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /booking/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5  
       restartPolicy: Always
       volumes:
-        - name: tt-resources-service-claim0
+        - name: tt-resources-service-pvc
           persistentVolumeClaim:
-            claimName: tt-resources-service-claim0
+            claimName: tt-resources-service-pvc

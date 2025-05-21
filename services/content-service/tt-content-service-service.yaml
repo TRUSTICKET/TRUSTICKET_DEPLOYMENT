@@ -1,16 +1,15 @@
 apiVersion: v1
-kind: Service
+kind: Service  
+
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.36.0 (HEAD)
-  labels:
-    io.kompose.service: tt-content-service
-  name: tt-content-service
+  name: tt-content-service  
+
 spec:
   ports:
-    - name: "18083"
-      port: 18083
-      targetPort: 8080
+    - name: "http"        
+      port: 18083    
+      targetPort: 8080    
+
   selector:
-    io.kompose.service: tt-content-service
+    app: tt-content-service  
+

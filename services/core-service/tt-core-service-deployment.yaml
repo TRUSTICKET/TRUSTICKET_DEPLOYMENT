@@ -20,11 +20,6 @@ spec:
       containers:
         - image: sjh9708/trusticket-core-service:latest  # 실행할 컨테이너 이미지 (Docker Hub 등에서 가져옴)
           name: tt-core-service  # 컨테이너 이름 (내부적으로 구분용)
-
-          ports:
-            - containerPort: 8080  # 컨테이너 내부의 애플리케이션이 바인딩(listen)하고 있는 포트, 서비스가 이 포트에서 listen함
-              protocol: TCP        # 프로토콜은 TCP (기본값이라 생략 가능)
-
           env:
             # (직접 환경변수 설정) Kafka 서버 주소 직접 지정
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
@@ -52,5 +47,23 @@ spec:
                 secretKeyRef:
                   name: tt-k8s-secret
                   key: core-database-password
-
+          resources:
+            requests:
+              cpu: "100m"         # 최소 0.1 core 사용 요청
+              memory: "128Mi"     # 최소 128MB 메모리 요청
+            limits:
+              cpu: "300m"         # 최대 0.3 core 제한
+              memory: "512Mi"     # 최대 512MB 제한
+          livenessProbe:
+            httpGet:
+              path: /booking/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /booking/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5  
       restartPolicy: Always  # 파드가 비정상 종료될 경우 항상 재시작하도록 설정 (기본값이기도 함)

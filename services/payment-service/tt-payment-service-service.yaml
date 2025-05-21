@@ -1,16 +1,16 @@
 apiVersion: v1
-kind: Service
+kind: Service  
+
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.36.0 (HEAD)
-  labels:
-    io.kompose.service: tt-payment-service
-  name: tt-payment-service
+  name: tt-payment-service  
+
 spec:
   ports:
-    - name: "18081"
-      port: 18081
-      targetPort: 8080
+    - name: "http"        
+      port: 18081    
+      targetPort: 8080    
+
   selector:
-    io.kompose.service: tt-payment-service
+    app: tt-payment-service  
+
+
