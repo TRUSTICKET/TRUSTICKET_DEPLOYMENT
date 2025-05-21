@@ -3,6 +3,8 @@ kind: Ingress                     # 이 리소스는 Ingress (외부 HTTP 요청
 
 metadata:
   name: trusticket-ingress       # Ingress 리소스의 이름 (kubectl get ingress 등에서 사용됨)
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 
 spec:
   ingressClassName: nginx  # Ingress Controller의 이름. 기본적으로 nginx ingress controller가 많이 사용됨
@@ -10,35 +12,35 @@ spec:
     - host: kubernetes.docker.internal  # 사용자가 브라우저에서 접속할 도메인 이름 (ex: http://trusticket.local)
       http:
         paths:  # 이 host로 들어온 요청 중 어떤 path로 들어왔는지를 기준으로 라우팅
-          - path: /core
+          - path: /core(/|$)(.*)
             pathType: Prefix
             backend:
               service:
                 name: tt-core-service  
                 port:
                   number: 18080        # 서비스가 노출하는 포트 번호
-          - path: /payment
+          - path: /payment(/|$)(.*)
             pathType: Prefix
             backend:
               service:
                 name: tt-payment-service  
                 port:
                   number: 18081
-          - path: /booking
+          - path: /booking(/|$)(.*)
             pathType: Prefix
             backend:
               service:
                 name: tt-booking-service  
                 port:
                   number: 18082
-          - path: /content
+          - path: /content(/|$)(.*)
             pathType: Prefix
             backend:
               service:
                 name: tt-content-service  
                 port:
                   number: 18083
-          - path: /resources
+          - path: /resources(/|$)(.*)
             pathType: Prefix
             backend:
               service:
