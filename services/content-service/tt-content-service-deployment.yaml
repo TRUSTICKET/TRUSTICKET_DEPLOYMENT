@@ -48,15 +48,15 @@ spec:
               memory: "512Mi"     # 최대 512MB 제한
           livenessProbe:
             httpGet:
-              path: /booking/actuator/health/liveness
+              path: /content/actuator/health
               port: 8080
-            initialDelaySeconds: 5
+            initialDelaySeconds: 100
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /booking/actuator/health/liveness
+              path: /content/actuator/health
               port: 8080
-            initialDelaySeconds: 5
+            initialDelaySeconds: 100
             periodSeconds: 5    
       restartPolicy: Always  
 
