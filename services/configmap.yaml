@@ -10,7 +10,7 @@ data:
   booking-database-server-connection-string: "jdbc:mariadb://172.30.1.29:4004/trusticket-booking-db?characterEncoding=UTF-8&serverTimezone=UTC"
   payment-database-server-connection-string: "jdbc:mariadb://172.30.1.29:4005/trusticket-payment-db?characterEncoding=UTF-8&serverTimezone=UTC"
   booking-redis-host: "172.30.1.29"
-  booking-redis-port: "6379" 
+  booking-redis-port: "6395" 
   elasticsearch-server: "172.30.1.29:9200"
   kafka-bootstrap-server: "172.30.1.29:9092"
 

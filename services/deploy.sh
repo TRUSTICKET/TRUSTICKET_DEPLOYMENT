@@ -26,8 +26,8 @@ kubectl apply -f ./resources-service/tt-resources-service-hpa.yaml
 
 kubectl apply -f ./ingress.yaml
 
-kubectl rollout restart deployment tt-core-service
-kubectl rollout restart deployment tt-booking-service
-kubectl rollout restart deployment tt-payment-service
-kubectl rollout restart deployment tt-content-service
-kubectl rollout restart deployment tt-resources-service
+# kubectl rollout restart deployment tt-core-service
+# kubectl rollout restart deployment tt-booking-service
+# kubectl rollout restart deployment tt-payment-service
+# kubectl rollout restart deployment tt-content-service
+# kubectl rollout restart deployment tt-resources-service

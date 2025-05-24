@@ -18,7 +18,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: 1111
       SPRING_KAFKA_BOOTSTRAP_SERVERS: tt-kafka:19092
       REDIS_HOST: tt-booking-redis
-      REDIS_PORT: 6379
+      REDIS_PORT: 6395
 #    volumes:
 #      - ./volumes/storage/upload:/app/trusticet/storage/upload
     networks:

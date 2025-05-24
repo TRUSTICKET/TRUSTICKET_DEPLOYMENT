@@ -49,21 +49,23 @@ spec:
                   key: core-database-password
           resources:
             requests:
-              cpu: "100m"         # 최소 0.1 core 사용 요청
-              memory: "128Mi"     # 최소 128MB 메모리 요청
+              cpu: "500m"         # 최소 0.5 core 사용 요청
+              memory: "512Mi"     # 최소 512MB 메모리 요청
             limits:
-              cpu: "300m"         # 최대 0.3 core 제한
-              memory: "512Mi"     # 최대 512MB 제한
+              cpu: "1000m"         # 최대 1 core 제한
+              memory: "1024Mi"     # 최대 1024MB 제한
           livenessProbe:
             httpGet:
               path: /core/actuator/health
               port: 8080
-            initialDelaySeconds: 100
+            initialDelaySeconds: 300
             periodSeconds: 10
+            timeoutSeconds: 5 
           readinessProbe:
             httpGet:
               path: /core/actuator/health
               port: 8080
-            initialDelaySeconds: 100
-            periodSeconds: 5  
+            initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5 
       restartPolicy: Always  # 파드가 비정상 종료될 경우 항상 재시작하도록 설정 (기본값이기도 함)

@@ -35,14 +35,16 @@ spec:
             httpGet:
               path: /resources/actuator/health
               port: 8080
-            initialDelaySeconds: 100
+            initialDelaySeconds: 300
             periodSeconds: 10
+            timeoutSeconds: 5 
           readinessProbe:
             httpGet:
               path: /resources/actuator/health
               port: 8080
-            initialDelaySeconds: 100
-            periodSeconds: 5  
+            initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5 
       restartPolicy: Always
       volumes:
         - name: tt-resources-service-pvc
